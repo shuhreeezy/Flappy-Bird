@@ -13,6 +13,20 @@ pygame.display.set_caption("Flappy Bird Clone")
 CLOCK = pygame.time.Clock()
 FPS = 30
 
+# # Load images
+# BIRD_IMAGE = pygame.image.load('assets/sprites/bird.png')
+# PIPE_IMAGE = pygame.image.load('assets/sprites/pipe.png')
+# BACKGROUND_IMAGE = pygame.image.load('assets/sprites/background.png')
+
+# # Load sounds
+# SOUNDS = {
+#     'die': pygame.mixer.Sound('assets/sounds/die.wav'),
+#     'hit': pygame.mixer.Sound('assets/sounds/hit.wav'),
+#     'point': pygame.mixer.Sound('assets/sounds/point.wav'),
+#     'swoosh': pygame.mixer.Sound('assets/sounds/swoosh.wav'),
+#     'wing': pygame.mixer.Sound('assets/sounds/wing.wav')
+# }
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
