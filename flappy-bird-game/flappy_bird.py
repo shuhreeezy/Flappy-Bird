@@ -90,7 +90,7 @@ def main():
             draw_pipe(pipe[0], pipe[1], SCREEN_HEIGHT - pipe[1] - pipe_gap)
 
         # Draw score
-        score_text = font.render(f"Score: {score}", True, WHITE)
+        score_text = font.render("Score: {score}", True, WHITE)
         screen.blit(score_text, (10, 10))
 
         # Check if bird hits ground
