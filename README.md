@@ -11,13 +11,14 @@ This project is a simple clone of the popular Flappy Bird game implemented in Py
 To run the game locally on your machine, follow these steps:
 
 1. Clone the repository:
-      git clone https://github.com/shuhreeezy/Flappy-Bird.git 
-      cd flappy-bird-game
-2. Install the required dependencies:
+      git clone https://github.com/shuhreeezy/Flappy-Bird.git
+   
+      ,cd flappy-bird-game
+3. Install the required dependencies:
       pip install -r requirements.txt
-3. Navigate to the `flappy_bird` directory:
+4. Navigate to the `flappy_bird` directory:
       cd flappy_bird
-4. Run the game:
+5. Run the game:
       python flappy_bird.py
 
 
