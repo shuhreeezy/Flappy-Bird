@@ -1,6 +1,9 @@
-import pygame
+"""
+Flappy Bird Clone
+A simple Flappy Bird clone implemented in Python using the Pygame library.
+"""
 import sys
-import random
+import pygame
 
 # Initialize Pygame
 pygame.init()
@@ -8,114 +11,100 @@ pygame.init()
 # Screen dimensions
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Flappy Bird Clone")
-CLOCK = pygame.time.Clock()
-FPS = 30
-
-# # Load images
-# BIRD_IMAGE = pygame.image.load('assets/sprites/bird.png')
-# PIPE_IMAGE = pygame.image.load('assets/sprites/pipe.png')
-# BACKGROUND_IMAGE = pygame.image.load('assets/sprites/background.png')
-
-# # Load sounds
-# SOUNDS = {
-#     'die': pygame.mixer.Sound('assets/sounds/die.wav'),
-#     'hit': pygame.mixer.Sound('assets/sounds/hit.wav'),
-#     'point': pygame.mixer.Sound('assets/sounds/point.wav'),
-#     'swoosh': pygame.mixer.Sound('assets/sounds/swoosh.wav'),
-#     'wing': pygame.mixer.Sound('assets/sounds/wing.wav')
-# }
 
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 
-# Bird parameters
-bird_size = 20
-bird_x = SCREEN_WIDTH // 4
-bird_y = SCREEN_HEIGHT // 2
-bird_velocity = 0
-gravity = 0.25
+# Game settings
+GRAVITY = 0.25
+BIRD_JUMP = -6
+PIPE_SPEED = -4
+PIPE_WIDTH = 50
+PIPE_HEIGHT = 320
+PIPE_GAP = 200
 
-# Pipe parameters
-pipe_width = 50
-pipe_gap = 200
-pipe_velocity = 3
-pipe_list = []
+# Bird class
+class Bird(pygame.sprite.Sprite):
+    """
+    A class to represent the bird in the game.
+    """
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((34, 24))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect(center=(50, SCREEN_HEIGHT // 2))
+        self.velocity = 0
 
-# Score
-score = 0
-font = pygame.font.Font(None, 36)
+    def update(self):
+        """
+        Update the bird's position based on velocity.
+        """
+        self.velocity += GRAVITY
+        self.rect.y += self.velocity
 
-def draw_bird(x, y):
-    pygame.draw.circle(screen, WHITE, (x, y), bird_size)
+    def jump(self):
+        """
+        Make the bird jump when the spacebar is pressed.
+        """
+        self.velocity = BIRD_JUMP
 
-def draw_pipe(x, y, height):
-    pygame.draw.rect(screen, BLUE, (x, y, pipe_width, height))
-    pygame.draw.rect(screen, BLUE, (x, y + height + pipe_gap, pipe_width, SCREEN_HEIGHT - y - height - pipe_gap))
+# Pipe class
+class Pipe(pygame.sprite.Sprite):
+    """
+    A class to represent the pipes in the game.
+    """
+    def __init__(self, flipped, x_position):
+        super().__init__()
+        self.image = pygame.Surface((PIPE_WIDTH, PIPE_HEIGHT))
+        self.image.fill(BLACK)
+        if flipped:
+            self.rect = self.image.get_rect(midbottom=(x_position, SCREEN_HEIGHT // 2 - PIPE_GAP // 2))
+        else:
+            self.rect = self.image.get_rect(midtop=(x_position, SCREEN_HEIGHT // 2 + PIPE_GAP // 2))
 
-def game_over():
-    game_over_text = font.render("Game Over", True, WHITE)
-    screen.blit(game_over_text, (150, 250))
+    def update(self):
+        """
+        Update the pipe's position on the screen.
+        """
+        self.rect.x += PIPE_SPEED
+        if self.rect.right < 0:
+            self.kill()
 
+# Game setup
 def main():
-    global bird_y, bird_velocity, score
-
+    """
+    Main function to run the game.
+    """
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-
-    while True:
+    bird = Bird()
+    bird_group = pygame.sprite.Group(bird)
+    pipes = pygame.sprite.Group()
+    spawn_pipe_event = pygame.USEREVENT
+    pygame.time.set_timer(spawn_pipe_event, 1200)
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    bird_velocity = -8
-
-        screen.fill(BLACK)
-
-        # Update bird position
-        bird_y += bird_velocity
-        bird_velocity += gravity
-
-        # Draw bird
-        draw_bird(bird_x, bird_y)
-
-        # Generate pipes
-        if len(pipe_list) == 0 or pipe_list[-1][0] < SCREEN_WIDTH // 2:
-            pipe_height = random.randint(50, SCREEN_HEIGHT - pipe_gap - 50)
-            pipe_list.append((SCREEN_WIDTH, pipe_height))
-
-        # Move pipes
-        for i, pipe in enumerate(pipe_list):
-            pipe_list[i] = (pipe[0] - pipe_velocity, pipe[1])
-
-            if pipe[0] + pipe_width < 0:
-                pipe_list.pop(i)
-                score += 1
-
-            # Check collision
-            if bird_x + bird_size > pipe[0] and bird_x < pipe[0] + pipe_width:
-                if bird_y < pipe[1] or bird_y + bird_size > pipe[1] + pipe_gap:
-                    game_over()
-
-        # Draw pipes
-        for pipe in pipe_list:
-            draw_pipe(pipe[0], pipe[1], SCREEN_HEIGHT - pipe[1] - pipe_gap)
-
-        # Draw score
-        score_text = font.render("Score: {score}", True, WHITE)
-        screen.blit(score_text, (10, 10))
-
-        # Check if bird hits ground
-        if bird_y > SCREEN_HEIGHT:
-            game_over()
-
+                running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                bird.jump()
+            if event.type == spawn_pipe_event:
+                pipes.add(Pipe(False, SCREEN_WIDTH))
+                pipes.add(Pipe(True, SCREEN_WIDTH))
+        bird_group.update()
+        pipes.update()
+        screen.fill(WHITE)
+        bird_group.draw(screen)
+        pipes.draw(screen)
+        if pygame.sprite.spritecollideany(bird, pipes):
+            running = False
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(60)
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()
-

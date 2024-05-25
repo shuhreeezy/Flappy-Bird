@@ -23,7 +23,7 @@
 import sys
 
 this_python = sys.version_info[:2]
-min_version = (3, 7)
+min_version = (2, 7)
 if this_python < min_version:
     message_parts = [
         "This script does not work on Python {}.{}".format(*this_python),
@@ -40,7 +40,7 @@ import shutil
 import tempfile
 import argparse
 import importlib
-from base64 import b85decode
+# from base64 import b85decode
 
 
 def include_setuptools(args):
